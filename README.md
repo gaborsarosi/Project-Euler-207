@@ -59,7 +59,11 @@ figure
 
 Since we need the **smallest** $m$ for which $P(m)\leq a/b$, we should correspondingly take the smaller solution $N$. There is one exception to this rule: when the closest integer to the right $n=\lfloor N \rfloor +1$ agrees with the jump point of the function, that is, it gives rise to a perfect partition. In this case, the function already jumps to its next branch at $n$, thus violating $P(m)\leq a/b$! So we need to check for this separately and in this case take the larger solution.
 
-So the practical problem boils down to solving the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$. How do we do this? Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method). While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this cases, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
+So the practical problem boils down to solving the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$. How do we do this? 
+
+The first and simplest thought that we can have is to simply scan the solution space one-by-one $N=2,3,4,5,...$.
+
+Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method). While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this cases, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
 $$m=4225000000000000000195000000000000000002.$$
 We then have a problem finding this solution because a float with 7 digits of precision (or a double with 15) will never see the 2 at the end. So we should come up with a method that allows us to use only integers.
 
@@ -71,8 +75,15 @@ In summary, we solve the equation in two steps:
 
 Now we explain how to implement point 1. The function jumps at the points $N=2^t$ and the left limit at this points if $\frac{t-1}{2^t-1}$. It is useful again to examine this on a figure: 
 
+![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotPbranchlimiters.png)
 
+The blue dots show the points $\left(2^t,\frac{t-1}{2^t-1}\right)$. Since these points are monotonically decreasing, to determine the branch, we are looking for an integral $t$ satisfying
+$$\frac{t-1}{2^t-1}\geq \frac{a}{b} \geq \frac{t}{2^{t+1}-1} ,$$
+or written in a form when we can evaluate all sides using only **integers**:
+$$ b(t-1) \geq a (2^t-1) \quad \quad \text{and} \quad \quad b t \leq a (2^{t+1}-1).$$
+These two inequalities are satisfied at the same time by only one value of $t$.
 
+In practice, the simplest way to determine the correct value of $t$ is by increasing step-by-step from $t=2$
 
 ## Implementing the solution in Python
 

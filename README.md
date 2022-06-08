@@ -47,7 +47,7 @@ Our task is to find the smallest $m$ for which $P(m)\leq a/b$, given $a$ and $b$
 ![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP.png)
 
 We can solve our problem by finding a real (but not neccessarily integer) solution to the equation
-$$\lfloor \log_2 N \rfloor}{N-1} = \frac{a}{b}$$
+$$\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$$
 Once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$.
 
 ## Implementing the solution in Python

@@ -8,7 +8,7 @@ The purpose of these notes is to walk through the solution to [Problem 207](http
 
 Consider the equation
 $$4^t=2^t+k.$$
-We will call values of $t$ for which $2^t,4^t,k$ are all positive integers a **partition**. We will call the partition **perfect**, when $t$ is also an integer. Let $P(m)$ be the fraction of perfect partitions to all partitions for $k\leq m$. The goal is to find the smallest $m$ for which $P(m)\leq \frac{a}{b}$, for given $a$ and $b$, both integers. In the HackerRank version of the problem, we are promised $a,b\leq 10^{18}$.
+We will call values of $t$ for which $2^t,4^t,k$ are all positive integers a **partition**. We will call the partition **perfect**, when $t$ is also an integer. Let $P(m)$ be the fraction of perfect partitions to all partitions for $k\leq m$. The goal is to find the smallest $m$ for which $P(m)\leq \frac{a}{b}$, for given $a$ and $b$, both positive integers. In the HackerRank version of the problem, we are promised $a,b\leq 10^{18}$.
 
 # Solution
 
@@ -42,7 +42,13 @@ $$P(2500)=5/49$$
 
 ## Describing the solution
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png)
+Our task is to find the smallest $m$ for which $P(m)\leq a/b$, given $a$ and $b$ positive integers. It is useful to plot the function $P(m)$ in terms of $N=\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$, the maximal integer value of $n=2^t$ for a given $m$:
+
+![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP.png)
+
+We can solve our problem by finding a real (but not neccessarily integer) solution to the equation
+$$\lfloor \log_2 N \rfloor}{N-1} = \frac{a}{b}$$
+Once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$.
 
 ## Implementing the solution in Python
 

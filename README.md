@@ -48,7 +48,31 @@ Our task is to find the smallest $m$ for which $P(m)\leq a/b$, given $a$ and $b$
 
 We can solve our problem by finding a real (but not neccessarily integer) solution to the equation
 $$\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$$
+
+put figure
+
 Once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$.
+
+The function has jumps where $\log_2 N$ is an integer, that is, at the location of perfect partitions $N=2^t$. Around these points, our equation has two solutions:
+
+figure
+
+Since we need the **smallest** $m$ for which $P(m)\leq a/b$, we should correspondingly take the smaller solution $N$. There is one exception to this rule: when the closest integer to the right $n=\lfloor N \rfloor +1$ agrees with the jump point of the function, that is, it gives rise to a perfect partition. In this case, the function already jumps to its next branch at $n$, thus violating $P(m)\leq a/b$! So we need to check for this separately and in this case take the larger solution.
+
+So the practical problem boils down to solving the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$. How do we do this? Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method). While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this cases, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
+$$m=4225000000000000000195000000000000000002.$$
+We then have a problem finding this solution because a float with 7 digits of precision (or a double with 15) will never see the 2 at the end. So we should come up with a method that allows us to use only integers.
+
+Luckily, the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$ can be easily solved by hand once we know which branch of the left hand side are we on, since on each branch, $\lfloor \log_2 N \rfloor$ is just a constant! So suppose that $2^{t-1}\leq N <2^t$. Then, $\lfloor \log_2 N \rfloor=t-1$ and
+$$N=1+b(t-1)/a.$$
+In summary, we solve the equation in two steps:
+1. For given $a$, $b$, find the correct branch of $P(m)$, that is, a $t$ for which $2^{t-1}\leq N <2^t$,
+2. Write the solution as $N=1+b(t-1)/a$ on the given branch.
+
+Now we explain how to implement point 1. The function jumps at the points $N=2^t$ and the left limit at this points if $\frac{t-1}{2^t-1}$. It is useful again to examine this on a figure: 
+
+
+
 
 ## Implementing the solution in Python
 

@@ -2,7 +2,7 @@
 
 # Introduction
 
-The purpose of these notes is to walk through the solution to [Problem 207](https://projecteuler.net/problem=207) on [projecteuler.net](http://projecteuler.net), and its programming version on [HackerRank](https://www.hackerrank.com/contests/projecteuler/challenges/euler207/problem). The problem can be solved with elementary math and programming knowledge. We provide a Python implementation.
+The purpose of these notes is to walk through the solution to [Problem 207](https://projecteuler.net/problem=207) on [projecteuler.net](http://projecteuler.net), and its programming version on [HackerRank](https://www.hackerrank.com/contests/projecteuler/challenges/euler207/problem). The problem can be solved with elementary math and programming knowledge. We provide a Python implementation. 
 
 ## The problem
 
@@ -18,7 +18,7 @@ Let's start by understanding the function $P(m)$. In order to do this, we need t
 
 Let's start with counting all partitions. Since for a partition $2^t$ is an integer, let's call this $n=2^t$. Notice that this automatically makes $4^t=n^2$ an integer as well. So on partitions, our equations reads as
 $$k=n(n-1),$$
-which, for $n=2,3,4,...$ gives the list of $k$s that give rise to partitions
+which, for $n=2,3,4,...$ gives the list of $k$ values that give rise to partitions
 $$k=2,6,12,20,...$$
 To count how many such $k\leq m$ integers there are, we merely need to find the positive root of the equation $m=n(n-1)$ in $n$ and check how many integers $n=2,3,4,...,N$ fit below this value. This is just given by the integer part minus one, because we should not count $n=1$ since it corresponds to $k=0$. The number of partitions is then
 $$\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor -1.$$
@@ -42,42 +42,44 @@ $$P(2500)=5/49$$
 
 ## Describing the solution
 
-Our task is to find the smallest $m$ for which $P(m)\leq a/b$, given $a$ and $b$ positive integers. It is useful to plot the function $P(m)$ in terms of $N=\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$, the maximal integer value of $n=2^t$ for a given $m$:
+Our task is to find the smallest $m$ for which $P(m)\leq a/b$, given $a$ and $b$ positive integers. It is useful to plot the function $P(m)$ in terms of $N=\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$:
 
 ![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP.png)
 
 We can solve our problem by finding a real (but not neccessarily integer) solution to the equation
 $$\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$$
 
-put figure
+![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP_w_aperb.png)
 
-Once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$.
+Once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$. If the function $P(m)$ was monotonic, this would have been our answer.
 
-The function has jumps where $\log_2 N$ is an integer, that is, at the location of perfect partitions $N=2^t$. Around these points, our equation has two solutions:
+However, the function is not monotonic. Instead it is piecewise monotonic between jumps that happen when $\log_2 N$ is an integer, that is, at the location of perfect partitions $N=2^t$. Around these points, our equation has two solutions:
 
-figure
+![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP_w_aperb_2.png)
 
-Since we need the **smallest** $m$ for which $P(m)\leq a/b$, we should correspondingly take the smaller solution $N$. There is one exception to this rule: when the closest integer to the right $n=\lfloor N \rfloor +1$ agrees with the jump point of the function, that is, it gives rise to a perfect partition. In this case, the function already jumps to its next branch at $n$, thus violating $P(m)\leq a/b$! So we need to check for this separately and in this case take the larger solution.
+Since we need the **smallest** $m$ for which $P(m)\leq a/b$, we should correspondingly take the smaller solution $N$ and take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. When this $n$ stays on the same branch, we are done, because the function will take smaller value at $n$ than at $N$. On the other hand, when $n$ moves past the jump point of the function, it violates $P(m=n(n-1))\leq a/b$! So we need to check for this separately and in this case take the larger solution.
 
 So the practical problem boils down to solving the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$. How do we do this? 
 
-The first and simplest thought that we can have is to simply scan the solution space one-by-one $N=2,3,4,5,...$.
+The first and simplest thought that we can have is to simply scan the solution space one-by-one $N=2,3,4,5,...$. However, when $a$ is small (say 1) and $b$ is large (say $10^{18}$), we have $\frac{\log_2 N}{N} \approx 10^{-18}$ or $N\approx 6.6 \cdot 10^{19}$. Quite a space to scan over, we cannot afford that! We need to do something better.
 
-Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method). While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this case, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
+Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method) to solve the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$. While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this case, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
 $$m=4225000000000000000195000000000000000002.$$
 We then have a problem finding this solution because a float with 7 digits of precision (or a double with 15) will never see the 2 at the end. So we should come up with a method that allows us to use only integers.
 
-Luckily, the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$ can be easily solved by hand once we know which branch of the left hand side are we on, since on each branch, $\lfloor \log_2 N \rfloor$ is just a constant! So suppose that $2^{t-1}\leq N <2^t$. Then, $\lfloor \log_2 N \rfloor=t-1$ and
-$$N=1+b(t-1)/a.$$
+Luckily, the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$ can be easily solved by hand once we know which branch of the left hand side are we on, since on each branch, $\lfloor \log_2 N \rfloor$ is just a constant! So suppose that $2^{t}\leq N <2^{t+1}$. Then, $\lfloor \log_2 N \rfloor=t$ and
+$$N=1+\frac{b t}{a}.$$
 In summary, we solve the equation in two steps:
-1. For given $a$, $b$, find the correct branch of $P(m)$, that is, a $t$ for which $2^{t-1}\leq N <2^t$,
-2. Write the solution as $N=1+b(t-1)/a$ on the given branch.
+1. For given $a$, $b$, find the correct branch of $P(m)$, that is, a $t$ for which $2^{t}\leq N <2^{t+1}$,
+2. Write the solution as $N=1+bt/a$ on the given branch.
 
-Now we explain how to implement point 1. The function jumps at the points $N=2^t$ and the left limit at this points if $\frac{t-1}{2^t-1}$. It is useful again to examine this on a figure: 
+Now we explain how to implement point 1. It is useful again to explain this on a figure: 
 
 ![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotPbranchlimiters.png)
 
-The blue dots show the points $\left(2^t,\frac{t-1}{2^t-1}\right)$. Since these points are monotonically decreasing, to determine the branch, we are looking for an integral $t$ satisfying
+The function jumps at the points $N=2^t$ and the blue dots show the points $\left(2^t,\frac{t-1}{2^t-1}\right)$. We wish to determine the $t$ for which $\frac{a}{b}$ (the gray dashed line) runs between the blue dotted line corresponding to $t$ and $t+1$. On the figure, $a=6$, $b=1000$ and the correct $t$ is $t=10$. 
+
+In equations, we are looking for an integer $t$ satisfying
 $$\frac{t-1}{2^t-1}\geq \frac{a}{b} > \frac{t}{2^{t+1}-1} ,$$
 or written in a form when we can evaluate all sides using only **integers**:
 $$ b(t-1) \geq a (2^t-1) \quad \quad \text{and} \quad \quad b t < a (2^{t+1}-1).$$
@@ -90,13 +92,13 @@ if b*(1)<=(2**(2)-1)*a:
   t=1
 else:
     t=2
-    while True:
-        if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
-            break
+    while not (b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a):
+        t+=1
 ```
 
+As noted before, we need to be able to reach $N\approx 2^t \approx 10^{20}$, or $t\approx 67$. So now we should succeed in just 67 steps!
 
-However, we can make our algorithm substantially faster, by using [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm) to determine $t$:
+However, we can make our algorithm even faster, by using [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm) to determine $t$. This allows us to finish in just $\log t_{\rm max}$ time, where $t_{\rm max}$ is the maximal allowed value for $t$. Let's throw in a few extra and take this to be 70:
 
 ```python
 if b*(1)<=(2**(2)-1)*a:
@@ -115,7 +117,7 @@ else:
     
 ``` 
 
-Now let us put everything together and wrap it into a function giving the solution. First, we determine the correct branch (the value of $t$) using binary search. Then we write the solution of the equation on the given branch, as discussed before. Finally we check for the edge case $n=\lfloor N \rfloor +1=2^{t+1}$, also described before. In summary:
+Now let us put everything together and wrap it into a function giving the solution. First, we determine the correct branch (the value of $t$) using binary search. Then we write the solution of the equation on the given branch, as discussed before. Finally we check if $n=\lfloor N \rfloor +1\geq 2^{t+1}$, in which case we need to move to the next branch, as described before. In summary:
 
 ```python
 def calcm(a,b):
@@ -137,7 +139,7 @@ def calcm(a,b):
     #Write the candidate solution, given t
     ncand=1+b*t//a+1
     
-    #Check for the edge cases: when ncand moved to the next branch
+    #Check if ncand moved to the next branch; if yes, move to the next branch
     while ncand>=2**(t+1):
         t+=1
         ncand=1+b*t//a+1
@@ -146,3 +148,4 @@ def calcm(a,b):
     m=ncand**2-ncand
     return m
 ``` 
+

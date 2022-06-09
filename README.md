@@ -63,7 +63,7 @@ So the practical problem boils down to solving the equation $\frac{\lfloor \log_
 
 The first and simplest thought that we can have is to simply scan the solution space one-by-one $N=2,3,4,5,...$.
 
-Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method). While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this cases, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
+Readers with some experience in numerical methods might be tempted to apply standard techniques such as the [Newton method](https://en.wikipedia.org/wiki/Newton%27s_method). While this works in theory, it requires us to work with floating point numbers, which leads to a numerical instability in evaluating $P(m)$ for large values of $m$. For instance, suppose that $a=1$ and $b=10^{18}$. In this case, the smallest $m$ such that $P(m)\leq 10^{-18}$ is
 $$m=4225000000000000000195000000000000000002.$$
 We then have a problem finding this solution because a float with 7 digits of precision (or a double with 15) will never see the 2 at the end. So we should come up with a method that allows us to use only integers.
 
@@ -78,33 +78,40 @@ Now we explain how to implement point 1. The function jumps at the points $N=2^t
 ![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotPbranchlimiters.png)
 
 The blue dots show the points $\left(2^t,\frac{t-1}{2^t-1}\right)$. Since these points are monotonically decreasing, to determine the branch, we are looking for an integral $t$ satisfying
-$$\frac{t-1}{2^t-1}\geq \frac{a}{b} \geq \frac{t}{2^{t+1}-1} ,$$
+$$\frac{t-1}{2^t-1}\geq \frac{a}{b} > \frac{t}{2^{t+1}-1} ,$$
 or written in a form when we can evaluate all sides using only **integers**:
-$$ b(t-1) \geq a (2^t-1) \quad \quad \text{and} \quad \quad b t \leq a (2^{t+1}-1).$$
-These two inequalities are satisfied at the same time by only one value of $t$.
+$$ b(t-1) \geq a (2^t-1) \quad \quad \text{and} \quad \quad b t < a (2^{t+1}-1).$$
+These two inequalities uniquely determine $t$.
 
-In practice, the simplest way to determine the correct value of $t$ is by increasing step-by-step from $t=2$:
+In practice, the simplest way to determine the correct value of $t$ is by increasing it one-by-one. First we check if we are on the $t=1$ branch. If not, we increase $t$ one-by-one until the two inequalities are satisfied simulaneously.
 
 ```python
-t=2
-while True:
-    if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
-        break
+if b*(1)<=(2**(2)-1)*a:
+  t=1
+else:
+    t=2
+    while True:
+        if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
+            break
 ```
 
 
-However, we can make our algorithm substantially faster, by using **binary search** to determine $t$:
+However, we can make our algorithm substantially faster, by using [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm) to determine $t$:
 
 ```python
-tl,tr=1,70
-while tl<tr-1:
-    t=(tl+tr)/2
-    if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
-        break
-    if b*(t-1)>(2**t-1)*a:
-        tl=t
-    else:
-        tr=t
+if b*(1)<=(2**(2)-1)*a:
+  t=1
+else:
+#Binary search for t
+  tl,tr=2,70
+  while tl<tr-1:
+      t=(tl+tr)//2
+      if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
+          break
+      if b*(t-1)>(2**t-1)*a:
+          tl=t
+      else:
+          tr=t
     
 ``` 
 
@@ -112,24 +119,28 @@ Now let us put everything together and wrap it into a function giving the soluti
 
 ```python
 def calcm(a,b):
+    #Check the t=1 edge case:
+    if b*(1)<=(2**(2)-1)*a:
+      t=1
+    else:
     #Binary search for t
-    tl,tr=1,70
-    while tl<tr-1:
-        t=(tl+tr)/2
-        if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
-            break
-        if b*(t-1)>(2**t-1)*a:
-            tl=t
-        else:
-            tr=t
-            
-    #Write the solution, given t
-    ncand=1+b*(t-1)/a+1
+      tl,tr=2,70
+      while tl<tr-1:
+          t=(tl+tr)//2
+          if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
+              break
+          if b*(t-1)>(2**t-1)*a:
+              tl=t
+          else:
+              tr=t
     
-    #Check for the edge case
-    if ncand==2**(t+1):
+    #Write the candidate solution, given t
+    ncand=1+b*t//a+1
+    
+    #Check for the edge cases: when ncand moved to the next branch
+    while ncand>=2**(t+1):
         t+=1
-        ncand=1+b*(t-1)/a+1
+        ncand=1+b*t//a+1
         
     #recover m from n
     m=ncand**2-ncand

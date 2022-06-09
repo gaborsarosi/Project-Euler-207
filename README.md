@@ -2,7 +2,7 @@
 
 # Introduction
 
-The purpose of these notes is to walk through the solution to [Problem 207](https://projecteuler.net/problem=207) on [projecteuler.net](http://projecteuler.net), and its programming version on [HackerRank](https://www.hackerrank.com/contests/projecteuler/challenges/euler207/problem).
+The purpose of these notes is to walk through the solution to [Problem 207](https://projecteuler.net/problem=207) on [projecteuler.net](http://projecteuler.net), and its programming version on [HackerRank](https://www.hackerrank.com/contests/projecteuler/challenges/euler207/problem). The problem can be solved with elementary math and programming knowledge. We provide a Python implementation.
 
 ## The problem
 
@@ -83,27 +83,55 @@ or written in a form when we can evaluate all sides using only **integers**:
 $$ b(t-1) \geq a (2^t-1) \quad \quad \text{and} \quad \quad b t \leq a (2^{t+1}-1).$$
 These two inequalities are satisfied at the same time by only one value of $t$.
 
-In practice, the simplest way to determine the correct value of $t$ is by increasing step-by-step from $t=2$
+In practice, the simplest way to determine the correct value of $t$ is by increasing step-by-step from $t=2$:
 
-## Implementing the solution in Python
+```python
+t=2
+while True:
+    if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
+        break
+```
+
+
+However, we can make our algorithm substantially faster, by using **binary search** to determine $t$:
+
+```python
+tl,tr=1,70
+while tl<tr-1:
+    t=(tl+tr)/2
+    if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
+        break
+    if b*(t-1)>(2**t-1)*a:
+        tl=t
+    else:
+        tr=t
+    
+``` 
+
+Now let us put everything together and wrap it into a function giving the solution. First, we determine the correct branch (the value of $t$) using binary search. Then we write the solution of the equation on the given branch, as discussed before. Finally we check for the edge case $n=\lfloor N \rfloor +1=2^{t+1}$, also described before. In summary:
 
 ```python
 def calcm(a,b):
-    ql,qr=1,70
-    while ql<qr-1:
-        q=(ql+qr)/2
-        if b*q>=(2**q-1)*a and b*(q+1)<(2**(q+1)-1)*a:
+    #Binary search for t
+    tl,tr=1,70
+    while tl<tr-1:
+        t=(tl+tr)/2
+        if b*(t-1)>=(2**t-1)*a and b*(t)<(2**(t+1)-1)*a:
             break
-        if b*q>(2**q-1)*a:
-            ql=q
+        if b*(t-1)>(2**t-1)*a:
+            tl=t
         else:
-            qr=q
-    if b*(q-1)<(2**q-1)*a:
-        q+=-1
-    xcand=1+b*q/a+1
-    if xcand==2**(q+1):
-        q+=1
-        xcand=1+b*q/a+1
-    m=xcand**2-xcand
+            tr=t
+            
+    #Write the solution, given t
+    ncand=1+b*(t-1)/a+1
+    
+    #Check for the edge case
+    if ncand==2**(t+1):
+        t+=1
+        ncand=1+b*(t-1)/a+1
+        
+    #recover m from n
+    m=ncand**2-ncand
     return m
 ``` 

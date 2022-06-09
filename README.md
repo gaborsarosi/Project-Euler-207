@@ -44,18 +44,18 @@ $$P(2500)=5/49$$
 
 Our task is to find the smallest $m$ for which $P(m)\leq a/b$, given $a$ and $b$ positive integers. It is useful to plot the function $P(m)$ in terms of $N=\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$:
 
-![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP.png)
+<img src="https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP.png" width="300">
 
 We can solve our problem by finding a real (but not neccessarily integer) solution to the equation
 $$\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$$
 
-![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP_w_aperb.png)
+<img src="https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP_w_aperb.png" width="300">
 
 Once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$. If the function $P(m)$ was monotonic, this would have been our answer.
 
 However, the function is not monotonic. Instead it is piecewise monotonic between jumps that happen when $\log_2 N$ is an integer, that is, at the location of perfect partitions $N=2^t$. Around these points, our equation has two solutions:
 
-![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP_w_aperb_2.png)
+<img src="https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP_w_aperb_2.png" width="300">
 
 Since we need the **smallest** $m$ for which $P(m)\leq a/b$, we should correspondingly take the smaller solution $N$ and take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. When this $n$ stays on the same branch, we are done, because the function will take smaller value at $n$ than at $N$. On the other hand, when $n$ moves past the jump point of the function, it violates $P(m=n(n-1))\leq a/b$! So we need to check for this separately and in this case take the larger solution.
 

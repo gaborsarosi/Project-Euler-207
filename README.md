@@ -21,8 +21,8 @@ $$k=n(n-1),$$
 which, for $n=2,3,4,...$ gives the list of $k$ values that give rise to partitions
 $$k=2,6,12,20,...$$
 To count how many such $k\leq m$ integers there are, we merely need to find the positive root of the equation $m=n(n-1)$ in $n$ and check how many integers $n=2,3,4,...,N$ fit below this value. This is just given by the integer part minus one, because we should not count $n=1$ since it corresponds to $k=0$. The number of partitions is then
-$$\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor -1.$$
-Note that the largest integer $N$ giving rise to a partition is just the integer part without the subtraction, $N= \lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$.
+$$\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor -1,$$
+where $\lfloor . \rfloor$ denotes the [floor function](https://en.wikipedia.org/wiki/Floor_and_ceiling_functions). Note that the largest integer $N$ giving rise to a partition is just the integer part without the subtraction, $N= \lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$.
 
 
 Now let us count the number of perfect partitions. A partition is perfect if $t=\log_2 n$ is an integer. To count the number of times that this happens for $n=2,3,4,...,N$, we again just need how many integers we can fit below $\log_2 N$, that is the integer part

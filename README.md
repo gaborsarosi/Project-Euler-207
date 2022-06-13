@@ -56,6 +56,8 @@ We can then draw in the value of $a/b$:
 
 We are asked to find the smallest integer at which the blue curve is below the orange line. Let's call this $n$. We can then recover $m$ by $m=n(n-1)$.
 
+### The slow
+
 The first and simplest thought that we can have is to simply start from $n=2$ and increase one-by-one:
 ```python
 n=2
@@ -64,6 +66,8 @@ while f(n)>a/b:
 ```
 In this code snippet, we assumed that we have defined the function $f(n)=\lfloor \log_2 n\rfloor/(n-1)$, which requires the math (or numpy) library. 
 This approach is correct, however, it has a serious pitfall, which is speed. When $a$ is small (say 1) and $b$ is large (say $10^{18}$), we have $\frac{\log_2 n}{n} \approx 10^{-18}$ or $n\approx 6.6 \cdot 10^{19}$. Quite a space to scan over, we cannot afford that! We need to do something more efficient.
+
+### The fast
 
 Let's explore the following idea. Suppose we have a way of solving the equation $\frac{\lfloor \log_2 N\rfloor}{N-1}=\frac{a}{b}$ for $N$. For most choices of $a$ and $b$, the solution will not be an integer, but a real number. But once we have a solution, we may take the nearest integer to the right of it: $n=\lfloor N \rfloor +1$. We translate this back to $m$ by $m=n(n-1)=\lfloor N \rfloor(\lfloor N \rfloor+1)$. If the function $P(m)$ was monotonic, this would have been our answer.
 
@@ -132,6 +136,8 @@ def findbranch(a,b):
 ```
 
 As noted before, we need to be able to reach $N\approx 2^t \approx 10^{20}$, or $t\approx 67$. So now we should succeed in just 67 steps!
+
+### The fastest
 
 However, we can make our algorithm even faster, by using [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm) to determine $t$. This allows us to finish in just $\log t_{\rm max}$ time, where $t_{\rm max}$ is the maximal allowed value for $t$. 
 

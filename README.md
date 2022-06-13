@@ -6,9 +6,9 @@ The purpose of these notes is to walk through the solution to [Problem 207](http
 
 ## The problem
 
-Consider the equation
-$$4^t=2^t+k.$$
-We will call values of $t$ for which $2^t,4^t,k$ are all positive integers a **partition**. We will call the partition **perfect**, when $t$ is also an integer. Let $P(m)$ be the fraction of perfect partitions to all partitions for $k\leq m$. The goal is to find the smallest $m$ for which $P(m)\leq \frac{a}{b}$, for given $a$ and $b$, both positive integers. In the HackerRank version of the problem, we are promised $a,b\leq 10^{18}$.
+Consider the equation $4^t=2^t+k$.
+We will call values of $t$ for which $2^t,4^t,k$ are all positive integers a __*partition*__. For example, the first two partitions are $4^1=2^1+2$ and $4^{1.58496...}=2^{1.58496...}+6$. We will such a partition __*perfect*__, when $t$ is also an integer. For example, $4^1=2^1+2$ is a perfect partition, and the next one is $4^2=2^2+12$.
+Let $P(m)$ denote the fraction of perfect partitions to all partitions for $k\leq m$. We are given $a$ and $b$, both positive integers. The goal is to find the smallest $m$ for which $P(m)\leq \frac{a}{b}$. In the HackerRank version of the problem, we are promised $a,b\leq 10^{18}$.
 
 # Solution
 
@@ -20,7 +20,11 @@ Let's start with counting all partitions. Since for a partition $2^t$ is an inte
 $$k=n(n-1),$$
 which, for $n=2,3,4,...$ gives the list of $k$ values that give rise to partitions
 $$k=2,6,12,20,...$$
-To count how many such $k\leq m$ integers there are, we merely need to find the positive root of the equation $m=n(n-1)$ in $n$ and check how many integers $n=2,3,4,...,N$ fit below this value. This is just given by the integer part minus one, because we should not count $n=1$ since it corresponds to $k=0$. The number of partitions is then
+To count how many such $k\leq m$ integers there are, let's look at a figure:
+
+<img src="https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotP.png" width="300">
+
+we just need to find the positive root of the equation $m=n(n-1)$ in $n$ and check how many integers $n=2,3,4,...,N$ fit below this value. The positive root of $m=n(n-1)$ is $\frac{1}{2}(1+\sqrt{1+4m})$. This is just given by the integer part minus one, because we should not count $n=1$ since it corresponds to $k=0$. The number of partitions is then
 $$\lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor -1,$$
 where $\lfloor . \rfloor$ denotes the [floor function](https://en.wikipedia.org/wiki/Floor_and_ceiling_functions). Note that the largest integer $N$ giving rise to a partition is just the integer part without the subtraction, $N= \lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor$.
 

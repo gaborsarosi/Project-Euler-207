@@ -29,7 +29,10 @@ $$\lfloor N \rfloor -1 = \lfloor \frac{1}{2}(1+\sqrt{1+4m}) \rfloor -1,$$
 where $\lfloor . \rfloor$ denotes the [floor function](https://en.wikipedia.org/wiki/Floor_and_ceiling_functions). 
 
 
-Now let us count the number of perfect partitions. Remember that a partition is perfect if $t=\log_2 n$ is an integer. To count the number of times that this happens for $n=2,3,4,...,N$, we again just need how many integers we can fit below $\log_2 N$, that is the integer part
+Now let us count the number of perfect partitions. Remember that a partition is perfect if $t=\log_2 n$ 
+is an integer. To count the number of times that this happens for $n=2,3,4,...,N$
+, we again just need how many integers we can fit below $\log_2 N$
+, that is the integer part
 $$\lfloor \log_2 N \rfloor.$$
 Note that now $n=2$ corresponds to $t=1$ so we do not need to subtract anything from this.
 
@@ -65,7 +68,12 @@ while f(n)>a/b:
   n+=1
 ```
 In this code snippet, we assumed that we have defined the function $f(n)=\lfloor \log_2 n\rfloor/(n-1)$, which requires the math (or numpy) library. 
-This approach is correct, however, it has a serious pitfall, which is speed. When $a$ is small (say 1) and $b$ is large (say $10^{18}$), we have $\frac{\log_2 n}{n} \approx 10^{-18}$ or $n\approx 6.6 \cdot 10^{19}$. Quite a space to scan over, we cannot afford that! We need to do something more efficient.
+This approach is correct, however, it has a serious pitfall, which is speed. When $a$
+is small (say 1) and $b$
+is large (say $10^{18}$
+), we have $\frac{\log_2 n}{n} \approx 10^{-18}$
+or $n\approx 6.6 \cdot 10^{19}$
+. Quite a space to scan over, we cannot afford that! We need to do something more efficient.
 
 ### The fast
 
@@ -83,7 +91,11 @@ Readers with some experience in numerical methods might be tempted to apply stan
 $$m=4225000000000000000195000000000000000002.$$
 We then have a problem finding this solution because a float with 7 digits of precision (or a double with 15) will never see the 2 at the end. So we should come up with a method that allows us to use only integers.
 
-Luckily, we can avoid working with non-integer variables. This is because the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$ can be easily solved by hand once we know which branch of the left hand side we are on, since on each branch, $\lfloor \log_2 N \rfloor$ is just a constant! So suppose that $2^{t}\leq N <2^{t+1}$. Then, $\lfloor \log_2 N \rfloor=t$ and
+Luckily, we can avoid working with non-integer variables. This is because the equation $\frac{\lfloor \log_2 N \rfloor}{N-1}  = \frac{a}{b}$
+can be easily solved by hand once we know which branch of the left hand side we are on, since on each branch, $\lfloor \log_2 N \rfloor$
+is just a constant! So suppose that $2^{t}\leq N <2^{t+1}$
+. Then, $\lfloor \log_2 N \rfloor=t$
+and
 $$N=1+\frac{b t}{a}.$$
 In summary, we solve the equation in two steps:
 1. For given $a$, $b$, find the correct branch of $P(m)$, that is, a $t$ for which $2^{t}\leq N <2^{t+1}$,
@@ -113,7 +125,11 @@ Now we explain how to implement point 1, that is, the function `findbranch(a,b)`
 
 ![alt text](https://github.com/gaborsarosi/Project-Euler-207/blob/main/plotPbranchlimiters.png)
 
-The function jumps at the points $N=2^t$ and the blue dots show the points $\left(2^t,\frac{t-1}{2^t-1}\right)$. We wish to determine the $t$ for which $\frac{a}{b}$ (the gray dashed line) runs between the blue dotted line corresponding to $t$ and $t+1$. On the figure, $a=6$, $b=1000$ and the correct $t$ is $t=10$. 
+The function jumps at the points $N=2^t$
+and the blue dots show the points $\left(2^t,\frac{t-1}{2^t-1}\right)$
+. We wish to determine the $t$
+for which $\frac{a}{b}$
+(the gray dashed line) runs between the blue dotted line corresponding to $t$ and $t+1$. On the figure, $a=6$, $b=1000$ and the correct $t$ is $t=10$. 
 
 In equations, we are looking for an integer $t$ satisfying
 $$\frac{t-1}{2^t-1}\geq \frac{a}{b} > \frac{t}{2^{t+1}-1} ,$$
@@ -139,7 +155,10 @@ As noted before, we need to be able to reach $N\approx 2^t \approx 10^{20}$, or 
 
 ### The fastest
 
-However, we can make our algorithm even faster, by using [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm) to determine $t$. This allows us to finish in just $\log t_{\rm max}$ time, where $t_{\rm max}$ is the maximal allowed value for $t$. 
+However, we can make our algorithm even faster, by using [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm) to determine $t$
+. This allows us to finish in just $\log t_{\rm max}$
+time, where $t_{\rm max}$
+is the maximal allowed value for $t$. 
 
 ```python
 def findbranch(a,b):
